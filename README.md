@@ -82,3 +82,67 @@ As a challenge, add the following functionality:
 3. In "edit mode", the first name, last name and birthday will be changed to `<input>` elements. Editing them and pressing ENTER will change them thru the API
 4. Each email, address and phone number will have a DELETE button next to it. Clicking this button should delete the entry in the API and update the UI
 5. Each of email, address and phone sections will have an ADD button. Clicking this button should open a popup with a form to add a new sub-entry of that type
+
+---
+
+## Additions
+
+### Modularizing JavaScript browser code...
+In a NodeJS environment, we were able to use `require` to define internal and external dependencies.
+Not only did it give us a large library of code at our fingertips using the NPM package manager, it also
+let us modularize our code.
+
+It turns out we can achieve a similar result for our browser code, even if it doesn't understand `require`.
+In the same spirit as compiling SASS -- a language that the browser doesn't understand -- into CSS, we can
+use a tool called Webpack to achieve the same thing for our browser JavaScript code.
+
+Webpack can look at our application's entry point (generally `app.js`), follow the tree of `require`s
+and create an independent bundle of code that the browser can understand.
+
+While Webpack has a ton of options, plugins and features, it is very easy to get started. By default,
+Webpack knows to look for our local dependencies, as well as those that are in the `node_modules`
+directory. This means we can use NPM to manage our front-end dependencies, `require` to load them into
+our app, and Webpack to compile them to a bundle that the browser can understand.
+
+To do this, we first need to install Webpack globally:
+
+```sh
+npm install --global webpack
+```
+
+This will give us access to a command line program called `webpack`. We can tell webpack to create a
+bundle for us by pointing it to the entry point of our app:
+
+```sh
+webpack --entry ./js/app.js --output-filename js/app-bundle.js
+```
+
+If we want Webpack to also watch our JavaScript for changes, we can run the same command with `--watch`:
+
+```sh
+webpack --watch --entry ./js/app.js --output-filename js/app-bundle.js
+```
+
+This will prevent us from having to re-run the compiler for every change we make.
+
+Two "issues" will occur with this:
+
+1. We have to remember the Webpack command line
+2. We now have to run two "watchers" in parallel: Webpack and SASS
+
+We can fix the first "issue" by creating a script in our `package.json`. Under the `"scripts"` section,
+we can modify `dev` to say `sass-dev` and `build` to `sass-build`, then we can add two scripts called
+`js-build` and `js-dev`, that will call `webpack` with the appropriate options.
+
+Normally when we start coding, we will want to both watch the SASS and JavaScript. One way to do this
+would be to open two terminal windows and run `npm run sass-dev` in one then `npm run js-dev` in the other.
+This is not exactly user-friendly, but we can do much better. There's an NPM package called `parallelshell`
+that enables us to run two commands simultaneously, and lets us press `Ctrl+C` to terminate everything.
+
+We can install `parallelshell` globally with `npm install -g parallelshell`, then run:
+
+```sh
+parallelshell "npm run sass-dev" "npm run js-dev"
+```
+
+We could then add a `dev` to our `"scripts"` in `package.json` and run both commands in parallel.
