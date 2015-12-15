@@ -146,3 +146,87 @@ parallelshell "npm run sass-dev" "npm run js-dev"
 ```
 
 We could then add a `dev` to our `"scripts"` in `package.json` and run both commands in parallel.
+
+---
+
+### Templating makes it easier to create a larger UI
+So far, we've created our UI using a mix of jQuery's `$.fn.html` or `$.fn.append`, manually directing
+the browser to create each and every element of our UI.
+
+It turns out there's a much more efficient way: browsers already know how to take a piece of HTML and
+make the elements out of it, and we already know how to write HTML code to create a UI. It turns out
+we can describe parts of our user interface using an HTML template, something that looks much like HTML,
+with some JavaScript variables or loops interspersed between the tags.
+
+For example, the following piece of jQuery code creates a UI that has a heading followed by a list. The
+list data comes from an array of objects, something that is common.
+
+```javascript
+var items = [
+  {id: 'fjeiwhfx', name: 'Box', price: 42},
+  {id: '8djf349e', name: 'Bag', price: 24}
+];
+
+var $app = $('#app'); // Target the "app div"
+$app.empty(); // Remove everything in app div
+
+$app.append('<h2>List of stuff</h2>'); // Add an <h2> to the app
+
+// Here, we use appendTo because it returns the created <ul>, letting us keep a reference to it.
+// We'll use this reference in a loop to add <li>s to that particular UL
+var $ul = $('<ul>').appendTo($app);
+
+items.forEach(function(item) {
+  $ul.append('<li data-id="' + item.id + '">' + item.name + ' ($' + item.price + ')</li>');
+});
+```
+
+Not only is the code verbose, it is awkward to concatenate strings with variables to build HTML. It makes
+it more difficult to see what is really going on when the `<li...` gets closed a few feet of code later :)
+
+For these reasons, we can replace the manual process of building the DOM by one of creating a template of
+HTML. The template code would look something like this:
+
+```html
+<div class="list-view">
+  <h2>List of stuff</h2>
+  <ul>
+    <% items.forEach(function(item) { %>
+    <li data-id="<%=item.id%>"><%=item.name%></li>
+    <% }); %>
+  </ul>
+</div>
+```
+
+The template itself can be represented as a JavaScript string, it's only text. We use two sets of special
+tags to make the template "alive": the `<%= %>` is used to output a value, and the `<% %>` is used to
+run arbitary JavaScript code. In general we will avoid putting application logic in the templates, opting
+for simple loops or outputting of values.
+
+The UnderscoreJS library provides a simple function as `_.template` that takes such a string, and returns
+a function. The returned function in turn takes a data object, and returns the HTML template "stamped"
+with the passed data. For example, with the code above, passing the template a data object as
+`{items: items}` would make the `items` variable available inside the template code.
+
+Because JavaScript cannot easily accept multi-line strings, we usually opt to put our template code
+directly in our HTML file. Most often, the template will be put inside a `<script type="text/template">` tag,
+because such tags are never displayed by the browsers, and the `type` ensures that the browser will not
+try to evaluate the script's content as JavaScript. By giving our `<script>` an HTML id, we can retrieve
+its text content easily using JavaScript:
+
+```javascript
+var listTemplateText = $('#listTemplate').text();
+
+// "Compile" the template using Underscore
+var listTemplate = _.template(listTemplateText);
+
+// listTemplate is now a function that can take data and return HTML
+var stuff = [
+  {id: 'xyz', name: 'Cube', price: 42},
+  {id: 'abc', name: 'Sphere', price: 24}
+];
+var output = listTemplate({items: stuff});
+
+// output is now some HTML that we can inject in our div, the browser will take care of the rest
+$('#app').html(output);
+```
