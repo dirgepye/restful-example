@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DecodeMTL Address Book</title>
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+
+<body>
+    <h1>DecodeMTL Address Book Application</h1>
+    <div id="form">
+        <form id="entryForm">
+            Home:
+            <input type='radio' name="home"> Work:
+            <input type='radio' name="work"> Other:
+            <input type='radio' name='radio'>
+            <br> First Name
+            <input id='firstNameInput' type='text' name='firstName'>
+            <br> Last Name
+            <input id='lastNameInput' type='text' name='lastName'>
+            <br> Date of Birth
+            <input id='birthdayInput' type='text' name='birthday'>
+            <input type='submit' name='submit'>
+
+        </form>
+
+
+
+        <form id="addEntry">
+            First Name:
+            <input id='firstNameAdd' type='text' name='firstName'>
+            <br>Last Name:
+            <input id='lastNameAdd' type='text' name='lastName'>
+            <br>Date of Birth:
+            <input id='birthdayAdd' type='text' name='birthday'>
+            <input type='submit' name='submit'>
+        </form>
+    </div>
+    
+    <div class="table">
+        <table>
+            <tr>
+                <td class="type">name</td>
+                <td>Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
+                sed diam nonummy nibh euismod tincidunt ut laoreet dolore
+                magna aliquam erat volutpat. </td>
+                <td class="table-button"><button>edit</button></td>
+                <td class="table-button"><button>delete</button></td>
+            </tr>
+            <tr>
+                <td class="type">address</td>
+                <td>dfadsfafd</td>
+                <td class="table-button"><button>edit</button></td>
+                <td class="table-button"><button>delete</button></td>
+            </tr>
+            <tr>
+                <td class="type">email</td>
+                <td>itatem insitam; est usus legentis
+                in iis qui facit eorum claritat</td>
+                <td class="table-button"><button>edit</button></td>
+                <td class="table-button"><button>delete</button></td>
+            </tr>
+            <tr>
+                <td class="type">phone</td>
+                <td>t lectores legere me lius quod ii legunt saepius.
+                Claritas est etiam processus dynamicus, qui sequitur mutationem
+                consuetudium lectorum. Mirum est notare quam littera gothica,
+                quam nunc putamus parum</td>
+                <td class="table-button"><button>edit</button></td>
+                <td class="table-button"><button>delete</button></td>
+            </tr>
+        </table>
+    </div>    
+    
+    
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+
+    <script>
+        $('#addEntry').on('submit', function(evt) {
+            evt.preventDefault();
+
+            var firstNameAdd = $('#firstNameAdd').val();
+            console.log(firstNameAdd);
+
+            var lastNameAdd = $('#lastNameAdd').val();
+            console.log(lastNameAdd);
+
+            var birthdayAdd = $('#birthdayAdd').val();
+            console.log(birthdayAdd);
+
+            $.ajax({
+                url: 'https://loopback-rest-api-demo-ziad-saab.c9.io/api/AddressBooks/18/Entries',
+                method: 'POST',
+                data: {
+                    firstName: firstNameAdd,
+                    lastName: lastNameAdd,
+                    birthday: birthdayAdd,
+                }
+            });
+
+
+        });
+    </script>
+
+
+
+
+
+
+    <script>
+        $('#entryForm').on('submit', function(evt) {
+            evt.preventDefault();
+
+            var firstName = $('#firstNameInput').val();
+            console.log(firstName);
+
+            var lastName = $('#lastNameInput').val();
+            console.log(lastName);
+
+            var birthday = $('#birthdayInput').val();
+
+            $.ajax({
+                url: 'https://loopback-rest-api-demo-ziad-saab.c9.io/api/Entries/15',
+                method: 'PUT',
+                data: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    birthday: birthday
+                }
+            });
+
+
+        });
+    </script>
+</body>
+
+</html>
